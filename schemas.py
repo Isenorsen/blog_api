@@ -1,8 +1,5 @@
-from marshmallow import Schema, fields, pprint
+from marshmallow import Schema, fields
 
-class UserSchema(Schema):
-    id = fields.Int()
-    username = fields.Str()
 
 class PostsSchema(Schema):
     id = fields.Int()
@@ -11,7 +8,24 @@ class PostsSchema(Schema):
     user_id = fields.Int()
     username = fields.Str()
 
+
 class CommentsSchema(Schema):
     id = fields.Int()
     text = fields.Str()
     user_id = fields.Int()
+    username = fields.Str()
+
+
+class UserSchema(Schema):
+    id = fields.Int()
+    username = fields.Str()
+    posts = fields.Nested('PostsSchema', many=True, exclude=('user_id', ))
+    comments = fields.Nested('CommentsSchema', many=True)
+
+
+class IndividualPostSchema(Schema):
+    header = fields.Str()
+    text = fields.Str()
+    user_id = fields.Int()
+    username = fields.Str()
+    comments = fields.Nested('CommentsSchema', many=True)

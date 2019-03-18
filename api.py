@@ -1,6 +1,6 @@
 from flask_restful import Resource, Api, reqparse
 from models import User, Posts, Comments
-from schemas import UserSchema, PostsSchema, CommentsSchema
+from schemas import UserSchema, PostsSchema, CommentsSchema, IndividualPostSchema
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -42,7 +42,9 @@ class ApiPosts(Resource):
         parser.add_argument('text')
         parser.add_argument('user_id')
         args = parser.parse_args()
-        new_post = Posts(header=args['header'], text=args['text'], user_id=args['user_id'])
+        new_post = Posts(header=args['header'],
+                         text=args['text'],
+                         user_id=args['user_id'])
         db.session.add(new_post)
         db.session.commit()
         return True
@@ -64,7 +66,31 @@ class ApiComments(Resource):
         parser.add_argument('user_id')
         parser.add_argument('text')
         args = parser.parse_args()
-        new_comment = Comments(user_id=args['user_id'], post_id=args['post_id'], text=args['text'])
+        user = User.query.filter_by(id=args['user_id']).first()
+        new_comment = Comments(user_id=args['user_id'],
+                               post_id=args['post_id'],
+                               text=args['text'],
+                               username=user.username)
         db.session.add(new_comment)
         db.session.commit()
         return True
+
+
+class ApiIndividualPost(Resource):
+    def get(self):
+
+        """
+        Method allows to get user's post and all it's comments by post_id
+
+        parameters: post_id (int)
+        """
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('post_id')
+        args = parser.parse_args()
+        post = Posts.query.filter_by(id=args['post_id'])
+        post_schema = IndividualPostSchema(many=True)
+        result = post_schema.dump(post)
+        return result
+
+

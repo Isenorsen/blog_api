@@ -18,12 +18,15 @@ class Posts(db.Model):
     header = sa.Column(sa.String(80), unique=False, nullable=False)
     text = sa.Column(sa.Text, unique=False, nullable=False)
     user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
-    user = db.relationship('User', backref=db.backref('posts', lazy=True))
+    user = db.relationship('User', backref=db.backref('posts', lazy='joined', innerjoin=True))
 
 
 class Comments(db.Model):
     __tablename__ = 'comments'
     id = sa.Column(sa.Integer, primary_key=True)
     text = sa.Column(sa.Text, unique=False, nullable=False)
+    username = sa.Column(sa.String(80), sa.ForeignKey('user.username'))
     user_id = sa.Column(sa.Integer, sa.ForeignKey('user.id'))
     post_id = sa.Column(sa.Integer, sa.ForeignKey('posts.id'))
+    post = db.relationship('Posts', backref=db.backref('comments', lazy=True))
+

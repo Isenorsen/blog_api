@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_restful import Api
-from api import ApiUsers, ApiComments, ApiPosts
+from api import ApiUsers, ApiComments, ApiPosts, ApiIndividualPost
 from extensions import db, migrate
 
 
@@ -13,6 +13,7 @@ migrate.init_app(app, db)
 api.add_resource(ApiUsers, '/users')
 api.add_resource(ApiPosts, '/posts')
 api.add_resource(ApiComments, '/comments')
+api.add_resource(ApiIndividualPost, '/post')
 
 
 app.run()
